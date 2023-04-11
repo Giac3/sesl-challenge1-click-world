@@ -9,6 +9,7 @@ function App() {
   const [places, setPlaces] = useState([])
   const [currentCity, setCurrentCity] = useState<string>()
   const [allCities, setAllCities] = useState([])
+  const [cityNotFound, setCityNotFound] = useState(false)
   const countries = new Countries()
 
   useEffect(() => {
@@ -24,8 +25,23 @@ function App() {
   }, [])
   
   useEffect(() => {
-    const location = countries.byName(getUserCountry().name)
-    setCurrentCity(location.countries[0].city)
+
+    let country = getUserCountry().name
+
+    let split = country.split(" ")
+
+    for (let i =0; i<split.length; i++) {
+      split[i] = split[i][0].toUpperCase() + split[i].substring(1)
+    }
+    country = split.join(" ")
+    
+    const location = countries.byName(country)
+    if(location.countries.length > 0) {
+      setCurrentCity(location.countries[0].city)
+    } else {
+      setCityNotFound(true)
+    }
+
     fetch('./ne_110m_populated_places_simple.geojson').then(res => res.json())
       .then(({ features }) => setPlaces(features));
       setLoading(false)
@@ -72,8 +88,8 @@ function App() {
       labelLng={(d:any) => d.properties.longitude}
       labelText={(d:any) => {
         let temp = "0"
-        allCities.map((item:any) => {
-          if (item.city === d.properties.name) {
+        allCities.forEach((item:any) => {
+          if (item.city.toLowerCase() === d.properties.name.toLowerCase()) {
             temp = `${item.count}`
           } else {
             temp = "0"
@@ -87,7 +103,10 @@ function App() {
       labelResolution={2}
      />
      <h3>Hello There, You are clicking from {getUserCountry().name}</h3>
-     <h4>This web app will add clicks to your capital city which is, {currentCity}</h4>
+
+     {
+      cityNotFound? <h4>Sorry we could not find your capital</h4> : <h4>This web app will add clicks to your capital city which is, {currentCity}</h4>
+     }
     </div>
   )
 }
