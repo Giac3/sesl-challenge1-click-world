@@ -1,0 +1,13 @@
+{
+  "name": "sesl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "build": "cd client && npm install && npm run build",
+    "start": "node server/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
